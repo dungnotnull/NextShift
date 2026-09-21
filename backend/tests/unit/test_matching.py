@@ -19,3 +19,9 @@ def test_match_score_fraction_of_requirements_met():
 
 def test_match_score_empty_target_is_zero():
     assert match_score({}, {}) == 0.0
+
+
+def test_extra_current_skills_ignored():
+    assert skill_gap({"scanning": 5}, {"wms": 2}) == {"wms": 2}
+    assert match_score({"scanning": 5}, {"wms": 2}) == 0.0
+    assert transferable_skills({"scanning": 5}, {"wms": 2}) == []
