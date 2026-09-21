@@ -2,7 +2,7 @@
 import os
 from pathlib import Path
 
-from aws_cdk import Duration, Stack
+from aws_cdk import CfnOutput, Duration, Stack
 from aws_cdk import aws_apigatewayv2 as apigwv2
 from aws_cdk import aws_apigatewayv2_integrations as apigwv2_integrations
 from aws_cdk import aws_events as events
@@ -88,5 +88,8 @@ class MessagingStack(Stack):
             t.grant_read_write_data(dispatcher)
             t.grant_read_write_data(hr_api)
         core.inbound_whatsapp.grant_publish(webhook)
+        invite.grant_invoke(hr_api)
 
         self.api_url = api.url
+        CfnOutput(self, "ApiUrl", value=api.url,
+                  description="HR dashboard HTTP API base URL")
