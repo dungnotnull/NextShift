@@ -4,17 +4,17 @@ import os
 from bedrock_agentcore.memory import MemorySessionManager
 from bedrock_agentcore.memory.constants import ConversationalMessage, MessageRole
 
-MEMORY_ID = os.environ.get("MEMORY_ID", "")
-
-
 def get_session(worker_id: str) -> MemorySessionManager | None:
-    if not MEMORY_ID:
+    memory_id = os.environ.get("MEMORY_ID", "")
+    if not memory_id:
         return None
-    manager = MemorySessionManager(memory_id=MEMORY_ID,
+    manager = MemorySessionManager(memory_id=memory_id,
                                    region_name=os.environ.get("AWS_REGION", "us-east-1"))
     try:
+        raw = f"nextshift-{worker_id}-session"
+        session_id = raw[:33].ljust(33, "0")
         manager.create_memory_session(actor_id=worker_id,
-                                      session_id=f"nextshift-{worker_id}-session-0000001")
+                                      session_id=session_id)
     except Exception:
         pass  # session already exists from a previous turn — reuse it
     return manager

@@ -3,6 +3,7 @@
 Payload (from webhook Lambda): {"prompt": str, "worker_id": str,
 "tone": str, "stage": str}. Response: {"reply": str}.
 """
+import asyncio
 import json
 import os
 
@@ -48,8 +49,11 @@ async def handler(request: dict):
         system += f"\nREMEMBERED FACTS:\n{memory_lines}\n"
 
     agent = Agent(model=MODEL_ID, tools=AGENT_TOOLS, system_prompt=system)
-    result = agent(prompt)  # strands Agent is callable, returns the final message
-    reply = str(result)
+    result = await asyncio.to_thread(agent, prompt)  # keep event loop free
+    try:
+        reply = result.message["content"][0]["text"]
+    except (KeyError, IndexError, TypeError):
+        reply = str(result)
 
     guard = check_output(reply)
     if guard.escalation:

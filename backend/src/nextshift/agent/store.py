@@ -2,7 +2,6 @@
 import json
 import os
 import time
-from datetime import date
 
 import boto3
 from boto3.dynamodb.conditions import Key
@@ -24,11 +23,19 @@ class Store:
         item = self._tables["workers"].get_item(Key={"worker_id": worker_id}).get("Item")
         if not item:
             return None
-        item["skills"] = {k: int(v) for k, v in (item.get("skills") or {}).items()}
-        item["opted_in"] = bool(item.get("opted_in", False))
-        return Worker(**{k: item[k] for k in
-                         ("worker_id", "phone", "name", "current_role", "company_id",
-                          "opted_in", "ttm_stage", "skills")})
+        try:
+            return Worker(
+                worker_id=item["worker_id"],
+                phone=item["phone"],
+                name=item.get("name", ""),
+                current_role=item.get("current_role", ""),
+                company_id=item.get("company_id", ""),
+                opted_in=bool(item.get("opted_in", False)),
+                ttm_stage=item.get("ttm_stage", "precontemplation"),
+                skills={k: int(v) for k, v in (item.get("skills") or {}).items()},
+            )
+        except (KeyError, ValueError):
+            return None  # corrupt record (e.g. bad phone) — treat as missing
 
     def list_roles(self, company_id: str) -> list[RoleProfile]:
         resp = self._tables["roles"].query(
@@ -73,13 +80,15 @@ class Store:
         events.put_item(Item={
             "worker_id": worker_id, "ts": str(time.time()),
             "type": type_, "detail": detail,
+            "expiration_date": int(time.time()) + 365 * 86400,
         })
 
     def load_lessons(self) -> dict:
         """Lessons are a static bundle stored in the roles table as JSON."""
         item = self._tables["roles"].get_item(Key={"role_id": "LESSONS",
                                                    "company_id": "GLOBAL"}).get("Item")
-        return json.loads(item["payload"]) if item else {}
+        payload = item.get("payload") if item else None
+        return json.loads(payload) if payload else {}
 
     def list_enrolled_workers(self) -> list:
         """Workers having a pathway (demo scale: scan pathway table)."""
