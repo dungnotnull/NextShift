@@ -31,3 +31,7 @@ def test_due_lessons_sorted_oldest_first():
         LessonProgress("L3", "s", 1, "2026-10-03"),
     ]
     assert [p.lesson_id for p in due_lessons(items, today=date(2026, 10, 2))] == ["L1", "L2"]
+
+
+def test_empty_due_date_never_due():
+    assert due_lessons([LessonProgress("L9", "s", 0, "")], today=date(2026, 10, 2)) == []
