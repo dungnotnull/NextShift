@@ -19,6 +19,6 @@
   "worker_skills": {
     "w-001": {"physical_handling": 5, "scanning": 4, "wms_software": 3, "safety_protocols": 4, "teamwork": 4},
     "w-002": {"wms_software": 4, "scanning": 3, "data_entry": 4, "attention_detail": 4},
-    "w-003": {"physical_handling": 4, "scanning": 3, "empathy": 4, "teamwork": 5}
+    "w-003": {"physical_handling": 4, "scanning": 3, "wms_software": 3, "empathy": 4, "teamwork": 5}
   }
 }

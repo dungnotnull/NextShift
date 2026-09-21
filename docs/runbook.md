@@ -49,3 +49,10 @@ Daily lessons run via EventBridge at 14:00 UTC.
 1. POST /impact-map  2. POST /invite (SMS)  3. worker replies on WhatsApp
 4. agent profiles + match_role (Maria: Robot Fleet Operator 50%) + enroll_pathway
 5. daily lesson -> submit_answer via chat  6. milestone email + RCS card.
+
+## Frontend
+```bash
+cd frontend && npm install
+NEXT_PUBLIC_API_URL=<ApiUrl from cdk outputs> npm run build
+npm start
+```
