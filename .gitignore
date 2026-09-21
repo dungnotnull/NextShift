@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+.next/
+dist/
+cdk.out/
+.env
+*.whl
+*.egg-info/
+.DS_Store
