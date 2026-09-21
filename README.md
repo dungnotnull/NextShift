@@ -134,6 +134,13 @@ npm start
 
 The 3-minute recording follows the script in [docs/demo-script.md](docs/demo-script.md) — the Maria story from impact map to milestone email.
 
+## Known limitations (hackathon scope)
+
+- The HTTP API has no authentication; it should not be exposed publicly as-is.
+- Lambda table grants are broad read/write on all tables rather than least-privilege.
+- SES milestone email uses a synthetic recipient domain until sandbox exit (see runbook).
+- WhatsApp template and WABA approvals, and the exact `agentcore deploy` CLI syntax, are validated at first real deploy (see runbook).
+
 ## License
 
 MIT — see [LICENSE](LICENSE).

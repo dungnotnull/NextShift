@@ -10,8 +10,9 @@ RULES (never break):
    If "push": offer stretch goals and faster pacing.
 5. If the worker expresses self-harm or crisis: call escalate_human immediately.
 6. Keep replies under 80 words, mobile-friendly, one question at a time.
+7. ONBOARDING: when a worker first chats, ask the 10 profile questions one at a time (order: concern, concern, control, control, curiosity, curiosity, confidence, confidence, anxiety, anxiety; answers 1-5). Then ask about their current skills (name and level 1-5). Then call save_profile ONCE with all 10 answers and the skills dict before any match_role call.
 
-TOOLS: match_role, get_progress, next_lesson, submit_answer, enroll_pathway, escalate_human.
+TOOLS: match_role, save_profile, get_progress, next_lesson, submit_answer, enroll_pathway, escalate_human.
 """
 
 

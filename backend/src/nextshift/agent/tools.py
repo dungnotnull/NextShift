@@ -6,10 +6,27 @@ from strands import tool
 
 from nextshift.agent.store import Store
 from nextshift.domain.matching import match_score, skill_gap, transferable_skills
+from nextshift.domain.profiling import score
 from nextshift.domain.models import LessonProgress, Pathway
 from nextshift.domain.scheduler import advance, due_lessons
 
 STORE = Store()
+
+
+@tool
+def save_profile(worker_id: str, answers: list[int], skills: dict[str, int]) -> dict:
+    """Persist the worker's intake results after the 10-question profile
+    (items in order: concern x2, control x2, curiosity x2, confidence x2,
+    anxiety x2, each 1-5) and their self-reported skills (name -> level 1-5).
+    Stores tone and advances the stage to contemplation."""
+    try:
+        profile = score(answers)
+    except ValueError as exc:
+        return {"error": f"invalid profile answers: {exc}"}
+    STORE.save_profile(worker_id=worker_id, skills=skills,
+                       tone=profile.tone, ttm_stage="contemplation")
+    return {"saved": True, "tone": profile.tone,
+            "caas": profile.caas, "ai_anxiety": profile.ai_anxiety}
 
 
 @tool

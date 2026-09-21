@@ -73,6 +73,7 @@ class MessagingStack(Stack):
 
         hr_api = fn(self, "hr-api", "nextshift.handlers.hr_api.handler",
                     {**env_common, "COMPANY_ID": "velocity",
+                     "COMPANY_NAME": "Velocity Logistics",
                      "INVITE_FUNCTION": invite.function_name})
 
         api = apigwv2.HttpApi(self, "hr-http-api")

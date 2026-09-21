@@ -41,6 +41,7 @@ def handler(event, context):
             InvocationType="Event",
             Payload=json.dumps({
                 "company_id": COMPANY_ID,
+                "company_name": os.environ.get("COMPANY_NAME", "Velocity Logistics"),
                 "workers": body.get("workers", []),
             }).encode())
         return {"statusCode": 202, "body": json.dumps({"invite_queued": True})}

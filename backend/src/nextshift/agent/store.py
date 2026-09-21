@@ -109,6 +109,15 @@ class Store:
             UpdateExpression="SET milestone_sent = :t",
             ExpressionAttributeValues={":t": True})
 
+    def save_profile(self, worker_id: str, skills: dict[str, int],
+                     tone: str, ttm_stage: str) -> None:
+        self._tables["workers"].update_item(
+            Key={"worker_id": worker_id},
+            UpdateExpression="SET skills = :s, tone = :t, ttm_stage = :st",
+            ExpressionAttributeValues={
+                ":s": skills, ":t": tone, ":st": ttm_stage,
+            })
+
     def list_enrolled_workers(self) -> list:
         """Workers having a pathway (demo scale: scan pathway table)."""
         resp = self._tables["pathways"].scan(ProjectionExpression="worker_id")

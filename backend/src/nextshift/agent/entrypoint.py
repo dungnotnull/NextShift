@@ -21,6 +21,7 @@ MODEL_ID = os.environ.get("BEDROCK_MODEL_ID", "us.amazon.nova-lite-v1:0")
 
 AGENT_TOOLS = [
     nextshift_tools.match_role,
+    nextshift_tools.save_profile,
     nextshift_tools.get_progress,
     nextshift_tools.next_lesson,
     nextshift_tools.submit_answer,
