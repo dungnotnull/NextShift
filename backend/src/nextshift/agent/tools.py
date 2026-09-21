@@ -120,6 +120,7 @@ def enroll_pathway(worker_id: str, target_role_id: str) -> dict:
         target_role_id=target_role_id,
         lesson_ids=lesson_ids,
     ))
+    STORE.set_ttm_stage(worker_id, "action")  # commitment made (TTM)
     return {"enrolled": True, "target_role_id": target_role_id,
             "lesson_count": len(lesson_ids)}
 

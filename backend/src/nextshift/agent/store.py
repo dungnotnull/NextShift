@@ -75,6 +75,12 @@ class Store:
             "correct_streak": p.correct_streak, "due_date": p.due_date,
         })
 
+    def set_ttm_stage(self, worker_id: str, stage: str) -> None:
+        self._tables["workers"].update_item(
+            Key={"worker_id": worker_id},
+            UpdateExpression="SET ttm_stage = :st",
+            ExpressionAttributeValues={":st": stage})
+
     def put_event(self, worker_id: str, type_: str, detail: str) -> None:
         events = self._dynamodb.Table(os.environ.get("EVENTS_TABLE", "nextshift-events"))
         events.put_item(Item={

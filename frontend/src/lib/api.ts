@@ -7,6 +7,9 @@ export interface WorkerRow {
   current_role: string;
   opted_in: boolean;
   ttm_stage: string;
+  target_role_id: string | null;
+  pathway_completion: number | null;
+  pathway_size: number;
 }
 
 export async function fetchWorkers(): Promise<WorkerRow[]> {

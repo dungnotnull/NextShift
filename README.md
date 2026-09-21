@@ -21,25 +21,56 @@ All channels share one **AgentCore Memory** (one session per worker) — the con
 
 ## Architecture
 
-```
-HR Dashboard (Next.js) ──► API Gateway ──► hr-api Lambda ──► DynamoDB
-                                                │ invite
-                                                ▼
-Worker phone ◄──SMS── EUM (pinpoint-sms-voice-v2) ◄── invite Lambda
-Worker phone ◄──► WhatsApp (EUM Social / socialmessaging) ──SNS──► webhook Lambda
-                                                                       │
-                                                     bedrock-agentcore invoke_agent_runtime
-                                                                       ▼
-                                              AgentCore Runtime (Strands agent, Nova Lite)
-                                              ├── 6 tools: match_role, get_progress, next_lesson,
-                                              │   submit_answer, enroll_pathway, escalate_human
-                                              ├── AgentCore Memory (cross-channel, per worker)
-                                              └── Guardrails (crisis + no-promises constitution)
-EventBridge (14:00 UTC daily) ──► dispatcher Lambda ──► WhatsApp/SMS lessons
-                                                   └──► SES milestone email + RCS card
+```mermaid
+flowchart TB
+    UI["HR Dashboard (Next.js)<br/>impact map · invites · progress console"]
+    API["API Gateway"]
+    HRAPI["hr-api Lambda"]
+    DDB[("DynamoDB<br/>workers · roles · pathways<br/>progress · consent · events")]
+
+    UI -->|"POST /impact-map · /invite · GET /workers"| API
+    API --> HRAPI
+    HRAPI --> DDB
+    HRAPI -.->|"async"| INV["invite Lambda"]
+
+    PHONE["Worker phone"]
+    SMS["AWS End User Messaging<br/>SMS / RCS"]
+    INV -->|"SMS invite"| SMS
+    SMS --> PHONE
+
+    WA["WhatsApp<br/>AWS EUM Social"]
+    PHONE -->|"worker replies"| WA
+    WA -->|"inbound events"| TOPIC["SNS topic<br/>nextshift-inbound-whatsapp"]
+    TOPIC --> HOOK["webhook Lambda"]
+
+    CORE["Bedrock AgentCore Runtime<br/>Strands agent · Amazon Nova Lite"]
+    MEM[("AgentCore Memory<br/>cross-channel, per worker")]
+    GUARD["Guardrails: no-promises constitution<br/>crisis → 988 + HR queue"]
+
+    HOOK -->|"invoke_agent_runtime<br/>stable per-worker session"| CORE
+    CORE <--> MEM
+    CORE --> GUARD
+    CORE -->|"7 tools"| DDB
+    HOOK -->|"guardrailed reply"| WA
+
+    CRON["EventBridge 14:00 UTC daily"]
+    DISP["dispatcher Lambda"]
+    CRON --> DISP
+    DISP -->|"due lesson (1/day)"| WA
+    DISP -->|"fallback"| SMS
+    DISP -->|"milestone certificate"| SES["Amazon SES"]
+    SES --> INBOX["Worker + HR inbox"]
+
+    style CORE fill:#f1500f,stroke:#191713,color:#ffffff
+    style MEM fill:#fdeae0,stroke:#191713,color:#191713
+    style GUARD fill:#fdeae0,stroke:#191713,color:#191713
 ```
 
-See [docs/architecture.md](docs/architecture.md) for resource names and per-component details.
+Dashboard preview:
+
+![NextShift HR console](docs/assets/dashboard-preview.png)
+
+See [docs/architecture.md](docs/architecture.md) for resource names and per-component details. For the Devpost architecture artifact, paste the mermaid block above into [mermaid.live](https://mermaid.live) and export as PNG.
 
 ## Research Foundation (28 sources)
 
