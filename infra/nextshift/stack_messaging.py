@@ -8,6 +8,7 @@ from aws_cdk import aws_apigatewayv2_integrations as apigwv2_integrations
 from aws_cdk import aws_events as events
 from aws_cdk import aws_events_targets as targets
 from aws_cdk import aws_lambda as lambda_
+from aws_cdk import aws_logs as logs
 from aws_cdk import aws_sns_subscriptions as sns_subs
 from constructs import Construct
 
@@ -21,9 +22,12 @@ def fn(scope, name: str, handler: str, env: dict, timeout: int = 60) -> lambda_.
         scope, name, function_name=f"nextshift-{name}",
         runtime=lambda_.Runtime.PYTHON_3_12,
         handler=handler,
-        code=lambda_.Code.from_asset(str(BACKEND_SRC)),
+        code=lambda_.Code.from_asset(
+            str(BACKEND_SRC),
+            exclude=["**/__pycache__", "nextshift.egg-info", "nextshift.egg-info/**"]),
         memory_size=512,
         timeout=Duration.seconds(timeout),
+        log_retention=logs.RetentionDays.ONE_WEEK,
         environment=env,
     )
 
