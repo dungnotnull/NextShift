@@ -1,0 +1,24 @@
+{
+  "company_id": "velocity",
+  "roles": [
+    {"role_id": "warehouse_associate", "title": "Warehouse Associate",
+     "affected": true,
+     "required_skills": {"physical_handling": 4, "scanning": 3, "wms_software": 2}},
+    {"role_id": "inventory_clerk", "title": "Inventory Clerk",
+     "affected": true,
+     "required_skills": {"wms_software": 3, "scanning": 3, "data_entry": 3}},
+    {"role_id": "robot_fleet_operator", "title": "Robot Fleet Operator",
+     "affected": false,
+     "required_skills": {"robot_monitoring": 3, "exception_handling": 3,
+                          "safety_protocols": 4, "wms_software": 3}},
+    {"role_id": "customer_care_specialist", "title": "Customer Care Specialist",
+     "affected": false,
+     "required_skills": {"de_escalation": 3, "order_management": 3,
+                          "wms_software": 3, "empathy": 4}}
+  ],
+  "worker_skills": {
+    "w-001": {"physical_handling": 5, "scanning": 4, "wms_software": 3, "safety_protocols": 4, "teamwork": 4},
+    "w-002": {"wms_software": 4, "scanning": 3, "data_entry": 4, "attention_detail": 4},
+    "w-003": {"physical_handling": 4, "scanning": 3, "empathy": 4, "teamwork": 5}
+  }
+}
