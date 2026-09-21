@@ -12,3 +12,4 @@ cdk.out/
 *.whl
 *.egg-info/
 .DS_Store
+PRJ-PROGRESS.md
