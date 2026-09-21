@@ -15,6 +15,8 @@ CRISIS_KEYWORDS = [
     "suicide",
     "want to die",
     "can't go on",
+    "cannot go on",
+    "cant go on",
     "hurt myself",
 ]
 
@@ -33,7 +35,7 @@ class GuardrailResult:
 
 
 def check_output(text: str) -> GuardrailResult:
-    lowered = text.lower()
+    lowered = " ".join(text.lower().split())
     claims = [c for c in FORBIDDEN_CLAIMS if c in lowered]
     crisis = any(k in lowered for k in CRISIS_KEYWORDS)
     return GuardrailResult(

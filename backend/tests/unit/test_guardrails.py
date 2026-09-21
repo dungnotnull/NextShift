@@ -20,3 +20,9 @@ def test_crisis_keyword_escalates():
 def test_safe_fallback_is_never_blocked():
     r = check_output(SAFE_FALLBACK)
     assert r.allowed and not r.escalation
+
+
+def test_whitespace_and_variant_evasion_caught():
+    r = check_output("Complete this course and I guarantee   you the\njob.")
+    assert not r.allowed
+    assert check_output("I cannot go on").escalation
