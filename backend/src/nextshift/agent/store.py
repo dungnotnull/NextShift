@@ -90,6 +90,25 @@ class Store:
         payload = item.get("payload") if item else None
         return json.loads(payload) if payload else {}
 
+    def milestone_sent(self, worker_id: str) -> bool:
+        resp = self._tables["pathways"].query(
+            KeyConditionExpression=Key("worker_id").eq(worker_id),
+            ProjectionExpression="milestone_sent")
+        items = resp.get("Items", [])
+        return bool(items and items[0].get("milestone_sent", False))
+
+    def mark_milestone(self, worker_id: str) -> None:
+        resp = self._tables["pathways"].query(
+            KeyConditionExpression=Key("worker_id").eq(worker_id),
+            ProjectionExpression="pathway_id")
+        items = resp.get("Items", [])
+        if not items:
+            return
+        self._tables["pathways"].update_item(
+            Key={"worker_id": worker_id, "pathway_id": items[0]["pathway_id"]},
+            UpdateExpression="SET milestone_sent = :t",
+            ExpressionAttributeValues={":t": True})
+
     def list_enrolled_workers(self) -> list:
         """Workers having a pathway (demo scale: scan pathway table)."""
         resp = self._tables["pathways"].scan(ProjectionExpression="worker_id")

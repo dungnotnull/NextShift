@@ -64,7 +64,7 @@ def handler(event, context):
         runtimeSessionId=session_id_for(worker["worker_id"]),
     )
     body = json.loads(resp["response"].read().decode())
-    reply = body.get("reply", "")
+    reply = body.get("reply", "")[:4096]
     WhatsAppSender(phone_id=os.environ.get("WA_PHONE_ID", "")).send_text(
         consent={"user_consents": True}, to=msg.phone, body=reply)
     return {"ok": True, "reply": reply}

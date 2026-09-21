@@ -3,6 +3,7 @@
 1. Send each enrolled worker their due lesson (WhatsApp if consented, SMS fallback).
 2. On 100% pathway completion, send the SES milestone email + RCS/SMS card.
 """
+import logging
 import os
 from datetime import date
 
@@ -29,32 +30,37 @@ CERT_TEMPLATE = """<h1>Congratulations, {name}!</h1>
 def handler(event, context):
     sent, milestones = 0, 0
     workers = store.list_enrolled_workers()
+    lessons = store.load_lessons()
     for worker in workers:
-        consent = consent_table.get_item(Key={"phone": worker.phone}).get("Item")
-        progress = store.list_progress(worker.worker_id)
-        pathway = store.get_pathway(worker.worker_id)
-        if pathway is None:
-            continue
+        try:
+            progress = store.list_progress(worker.worker_id)
+            pathway = store.get_pathway(worker.worker_id)
+            if pathway is None:
+                continue
 
-        done = [p.lesson_id for p in progress if p.correct_streak >= 1]
-        if pathway.completion(done) >= 1.0:
-            milestones += 1
-            _send_milestone(worker, pathway)
-            continue
+            done = [p.lesson_id for p in progress if p.correct_streak >= 1]
+            if pathway.completion(done) >= 1.0:
+                if store.milestone_sent(worker.worker_id):
+                    continue
+                _send_milestone(worker, pathway)
+                store.mark_milestone(worker.worker_id)
+                milestones += 1
+                continue
 
-        lessons = store.load_lessons()
-        due = due_lessons(progress, date.today())
-        if not due and done:
-            pending = [lid for lid in pathway.lesson_ids if lid not in done]
-            if pending:
-                lesson = lessons.get(pending[0], {})
+            consent = consent_table.get_item(Key={"phone": worker.phone}).get("Item")
+            due = due_lessons(progress, date.today())
+            if due:
+                lesson = lessons.get(due[0].lesson_id, {})
                 _deliver(worker, consent, lesson)
                 sent += 1
-            continue
-        for p in due[:1]:         # Fogg: one tiny action per day
-            lesson = lessons.get(p.lesson_id, {})
-            _deliver(worker, consent, lesson)
-            sent += 1
+            else:
+                pending = [lid for lid in pathway.lesson_ids if lid not in done]
+                if pending:
+                    lesson = lessons.get(pending[0], {})
+                    _deliver(worker, consent, lesson)
+                    sent += 1
+        except Exception:
+            logging.exception("dispatcher failed for worker %s", worker.worker_id)
     return {"lessons_sent": sent, "milestones": milestones}
 
 
