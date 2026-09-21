@@ -34,3 +34,10 @@ def test_middle_gets_balanced():
 def test_rejects_wrong_answer_count():
     with pytest.raises(ValueError):
         score([3] * 9)
+
+
+def test_rejects_out_of_range_answers():
+    with pytest.raises(ValueError):
+        score([0] * 10)
+    with pytest.raises(ValueError):
+        score([6] * 10)

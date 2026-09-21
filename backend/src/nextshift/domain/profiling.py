@@ -25,6 +25,8 @@ ITEMS = [
 def score(answers: list[int]) -> Profiling:
     if len(answers) != len(ITEMS):
         raise ValueError(f"expected {len(ITEMS)} answers, got {len(answers)}")
+    if not all(1 <= a <= 5 for a in answers):
+        raise ValueError("each answer must be an integer 1-5")
     dims: dict[str, list[int]] = {d: [] for d in DIMENSIONS}
     for (dim, _), ans in zip(ITEMS, answers, strict=True):
         dims[dim].append(ans)
