@@ -21,6 +21,7 @@ export async function uploadImpactMap(csv: string): Promise<number> {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ csv }),
   });
+  if (!res.ok) throw new Error(`impact-map ${res.status}`);
   const body = await res.json();
   return body.ingested ?? 0;
 }

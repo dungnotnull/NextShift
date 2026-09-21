@@ -27,14 +27,22 @@ export default function Home() {
   async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const ingested = await uploadImpactMap(await file.text());
-    setStatus(`Impact map ingested: ${ingested} workers`);
-    refresh();
+    try {
+      const ingested = await uploadImpactMap(await file.text());
+      setStatus(`Impact map ingested: ${ingested} workers`);
+      await refresh();
+    } catch {
+      setStatus("Upload failed. Check the API is reachable and the CSV format.");
+    }
   }
 
   async function onInvite() {
-    await inviteWorkers(workers);
-    setStatus("SMS invites queued");
+    try {
+      await inviteWorkers(workers);
+      setStatus("SMS invites queued");
+    } catch {
+      setStatus("Invite failed. Check the API is reachable.");
+    }
   }
 
   return (
